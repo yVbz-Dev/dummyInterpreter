@@ -6,6 +6,19 @@ import (
 	"os"
 )
 
+type Token struct {
+	Token     string
+	Line      int
+	Column    int
+	tokenType string
+}
+
+type ASTNode struct {
+	NodeType string
+	Value    any
+	Children []ASTNode
+}
+
 func main() {
 	// read file
 	conteudo, err := os.Open("codigo.e")

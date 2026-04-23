@@ -2,15 +2,7 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 )
-
-type Token struct {
-	Token     string
-	Line      int
-	Column    int
-	tokenType string
-}
 
 func lexer(sourceCode bufio.Scanner) {
 	var lineNum int = 0
@@ -21,15 +13,14 @@ func lexer(sourceCode bufio.Scanner) {
 
 		// tokenize!
 		var tokens []Token = tokenize(line, lineNum)
-		for _, token := range tokens {
-			fmt.Println(token.Token)
-		}
+		parser(tokens)
 	}
 }
 
 func tokenize(line string, lineNum int) []Token {
 	// vars
 	var currToken string
+	var currTokenType string
 	var readingToken bool = false
 	var tokens = []Token{}
 
@@ -39,25 +30,34 @@ func tokenize(line string, lineNum int) []Token {
 
 		switch {
 		case char == ' ':
-			continue
+			if readingToken && currTokenType != "string" {
+				tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+				currTokenType = ""
+				currToken = ""
+				readingToken = false
+			} else if readingToken {
+				currToken += string(char)
+			}
 		case char == '"':
 			if readingToken {
 				readingToken = false
-				tokens = append(tokens, Token{currToken, lineNum, i, "string"})
+				tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
 				currToken = ""
+				currTokenType = ""
 			} else {
 				readingToken = true
+				currTokenType = "string"
 			}
+		case (char >= '0' && char <= '9') && currTokenType != "string":
+			readingToken = true
+			currTokenType = "number"
+			currToken += string(char)
 		case readingToken:
 			currToken += string(char)
 		default:
-			if readingToken {
-				readingToken = false
-				tokens = append(tokens, Token{currToken, lineNum, i, "command"})
-			} else {
-				readingToken = true
-				currToken += string(char)
-			}
+			readingToken = true
+			currTokenType = "command"
+			currToken += string(char)
 
 		}
 	}
