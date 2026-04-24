@@ -1,2 +1,2 @@
-var minha_variavel = "Hello world"
+var minha_variavel = "A"+
 print minha_variavel

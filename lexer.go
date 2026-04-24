@@ -54,6 +54,8 @@ func tokenize(line string, lineNum int) []Token {
 			readingToken = true
 			currTokenType = "number"
 			currToken += string(char)
+		case char == '/' && line[i+1] == '/' && !readingToken:
+			return tokens
 		case readingToken:
 			currToken += string(char)
 		default:

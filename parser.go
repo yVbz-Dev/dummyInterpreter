@@ -14,19 +14,68 @@ func parser(tokens []Token) {
 
 		switch {
 		case token.Token == KW_PRINT:
+			// vars
+			var printVal string
+
+			// get all the + signs and the tokens
+			var posUpdaterVar int = 0
+			for i := pos + 1; i < len(tokens); i++ {
+				var iToken Token = tokens[i]
+				if isKeyword(iToken.Token) && iToken.Token != KW_PLUS {
+					break
+				} else {
+					if iToken.Token == KW_PLUS {
+						continue
+					}
+					VarInMemory := memory["var_"+iToken.Token]
+					if VarInMemory != nil {
+						printVal += VarInMemory.(string)
+					} else {
+						printVal += iToken.Token
+					}
+				}
+				i++
+				posUpdaterVar++
+			}
+
 			// create node
 			var node ASTNode
 			node.NodeAction = token.Token
 			node.NodeArgs = map[string]any{
-				"value": nextToken(tokens, pos).Token,
+				"value": printVal,
 			}
-			pos++
+			pos += posUpdaterVar
 			program = append(program, node)
 		case token.Token == KW_VAR:
 			// vars
 			var varName Token = nextToken(tokens, pos)
 			var equalSign Token = nextToken(tokens, pos+1)
 			var value Token = nextToken(tokens, pos+2)
+			var valueStr string
+
+			// get all the + signs and the tokens
+			var posUpdateVar = 3
+			for i := pos + 3; i < len(tokens); i++ {
+				// var
+				var iToken Token = tokens[i]
+
+				if isKeyword(iToken.Token) && iToken.Token != KW_PLUS {
+					break
+				} else {
+					if iToken.Token == KW_PLUS {
+						continue
+					}
+					varInMemory := memory["var_"+iToken.Token]
+					if varInMemory != nil {
+						valueStr += varInMemory.(string)
+					} else {
+						valueStr += iToken.Token
+					}
+				}
+				// update pos
+				posUpdateVar++
+				i++
+			}
 
 			// check
 			if isKeyword(varName.Token) {
@@ -46,11 +95,11 @@ func parser(tokens []Token) {
 			var node ASTNode
 			node.NodeAction = token.Token
 			node.NodeArgs = map[string]any{
-				"value":   value.Token,
+				"value":   valueStr,
 				"varName": varName.Token,
 			}
 			program = append(program, node)
-			pos += 2
+			pos += posUpdateVar
 		}
 		pos++
 	}

@@ -23,16 +23,34 @@ var memory = make(map[string]any)
 const (
 	KW_PRINT = "print"
 	KW_VAR   = "var"
+	KW_PLUS  = "+"
+	KW_MINUS = "-"
+	KW_MULT  = "*"
+	KW_DIV   = "/"
+	KW_EQUAL = "="
 )
 
 var keywords = map[string]bool{
 	KW_PRINT: true,
 	KW_VAR:   true,
+	KW_PLUS:  true,
+	KW_MINUS: true,
+	KW_MULT:  true,
+	KW_DIV:   true,
+	KW_EQUAL: true,
 }
 
 func main() {
+	// get file
+	args := os.Args
+	if len(args) < 2 {
+		fmt.Println("Usage: go run main.go <filename.e>")
+		return
+	}
+
 	// read file
-	conteudo, err := os.Open("codigo.e")
+	filename := args[1]
+	conteudo, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Erro ao abrir o arquivo .e: ", err)
 	}
