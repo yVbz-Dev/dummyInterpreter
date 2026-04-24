@@ -28,6 +28,7 @@ func tokenize(line string, lineNum int) []Token {
 	for i := 0; i < len(line); i++ {
 		char := line[i]
 
+		// cases
 		switch {
 		case char == ' ':
 			if readingToken && currTokenType != "string" {

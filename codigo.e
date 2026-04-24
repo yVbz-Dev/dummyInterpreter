@@ -1,3 +1,1 @@
-print "Codigo!"
-
-print "Hello world!"
+print "Hello world"

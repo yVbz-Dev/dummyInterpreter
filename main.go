@@ -14,9 +14,8 @@ type Token struct {
 }
 
 type ASTNode struct {
-	NodeType string
-	Value    any
-	Children []ASTNode
+	NodeAction string
+	NodeArgs   map[string]any
 }
 
 func main() {
