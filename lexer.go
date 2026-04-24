@@ -48,6 +48,7 @@ func tokenize(line string, lineNum int) []Token {
 			} else {
 				readingToken = true
 				currTokenType = "string"
+
 			}
 		case (char >= '0' && char <= '9') && currTokenType != "string":
 			readingToken = true
@@ -59,7 +60,14 @@ func tokenize(line string, lineNum int) []Token {
 			readingToken = true
 			currTokenType = "command"
 			currToken += string(char)
+		}
 
+		if i+1 >= len(line) {
+			// append the fucking token
+			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+			currTokenType = ""
+			currToken = ""
+			readingToken = false
 		}
 	}
 

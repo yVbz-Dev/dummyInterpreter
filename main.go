@@ -18,6 +18,18 @@ type ASTNode struct {
 	NodeArgs   map[string]any
 }
 
+var memory = make(map[string]any)
+
+const (
+	KW_PRINT = "print"
+	KW_VAR   = "var"
+)
+
+var keywords = map[string]bool{
+	KW_PRINT: true,
+	KW_VAR:   true,
+}
+
 func main() {
 	// read file
 	conteudo, err := os.Open("codigo.e")
