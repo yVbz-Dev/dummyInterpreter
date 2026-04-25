@@ -2,8 +2,16 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 )
+
+var equationForce map[string]int = map[string]int{
+	KW_PLUS:  1,
+	KW_MINUS: 1,
+	KW_MULT:  2,
+	KW_DIV:   2,
+}
 
 func parser(tokens []Token) {
 	// var program []ASTNode
@@ -54,8 +62,8 @@ func parser(tokens []Token) {
 			var valueStr string
 
 			// get all the + signs and the tokens
-			var posUpdateVar = 3
-			for i := pos + 3; i < len(tokens); i++ {
+			var posUpdateVar = 0
+			for i := pos; i < len(tokens); i++ {
 				// var
 				var iToken Token = tokens[i]
 
@@ -100,10 +108,40 @@ func parser(tokens []Token) {
 			}
 			program = append(program, node)
 			pos += posUpdateVar
+		case token.tokenType == "number":
+			var equation = []Token{}
+			var posUpdaterVar = 0
+			for i := pos; i < len(tokens); i++ {
+				var iToken Token = tokens[i]
+				if isKeyword(iToken.Token) && !isOperator(iToken.Token) {
+					break
+				}
+				equation = append(equation, iToken)
+				posUpdaterVar++
+			}
+
+			// calculate the equation
+			// var result int = 0
+			var onHold []int = []int{}
+			for i := 0; i < len(equation); i++ {
+				var iToken Token = equation[i]
+				if !isOperator(iToken.Token) {
+					continue
+				}
+				onHold = append(onHold, i)
+			}
+
+			sort.Slice(onHold, func(i, j int) bool {
+				return i > j
+			})
+			fmt.Println(equation)
+			fmt.Println(onHold)
+
+			pos += posUpdaterVar
 		}
 		pos++
+		runner(program)
 	}
-	runner(program)
 }
 
 func nextToken(tokens []Token, currToken int) Token {
@@ -133,4 +171,13 @@ func prevToken(tokens []Token, currToken int) Token {
 func isKeyword(s string) bool {
 	_, exists := keywords[s]
 	return exists
+}
+
+func isOperator(s string) bool {
+	isOperator := s == KW_PLUS || s == KW_MINUS || s == KW_MULT || s == KW_DIV
+	return isOperator
+}
+
+func operatorForce(s string) int {
+	return equationForce[s]
 }

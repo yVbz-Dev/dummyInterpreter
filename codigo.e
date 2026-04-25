@@ -1,2 +1,2 @@
-var minha_variavel = "A"+
-print minha_variavel
+var conta = 2 + 3 * 4
+print conta
