@@ -38,10 +38,25 @@ func parser(tokens []Token) {
 					}
 
 					// check equation
-					if iToken.tokenType == "number" {
+					VarInMemory := memory["var_"+iToken.Token]
+					var isVar bool = false
+					if VarInMemory != nil {
+						_, err := strconv.Atoi(VarInMemory.(string))
+						if err != nil {
+							return
+						}
+						isVar = true
+					}
+
+					if iToken.tokenType == "number" || isVar {
 						var equation []Token = []Token{}
 						var result int
-						for j := i - 2; j < len(tokens); j++ {
+						var iRemover int = 2
+						if isVar {
+							iRemover = 0
+						}
+
+						for j := i - iRemover; j < len(tokens); j++ {
 							var jToken Token = tokens[j]
 							if isKeyword(jToken.Token) && !isOperator(jToken.Token) {
 								break
