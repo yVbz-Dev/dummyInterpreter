@@ -41,12 +41,19 @@ func parser(tokens []Token) {
 					if iToken.tokenType == "number" {
 						var equation []Token = []Token{}
 						var result int
-						for j := i; j < len(tokens); j++ {
+						for j := i - 2; j < len(tokens); j++ {
 							var jToken Token = tokens[j]
 							if isKeyword(jToken.Token) && !isOperator(jToken.Token) {
 								break
 							}
-							equation = append(equation, jToken)
+
+							VarInMemory := memory["var_"+jToken.Token]
+							if VarInMemory != nil {
+								equation = append(equation, Token{VarInMemory.(string), jToken.Line, jToken.Column, "number"})
+							} else {
+								equation = append(equation, jToken)
+							}
+
 						}
 						result = solveEquation(equation)
 						printVal = strconv.Itoa(result)
@@ -92,11 +99,28 @@ func parser(tokens []Token) {
 					if iToken.Token == KW_PLUS {
 						continue
 					}
-					varInMemory := memory["var_"+iToken.Token]
-					if varInMemory != nil {
-						valueStr += varInMemory.(string)
+
+					if iToken.tokenType == "number" {
+						var equation []Token = []Token{}
+						var result int
+						for j := i; j < len(tokens); j++ {
+							var jToken Token = tokens[j]
+							if isKeyword(jToken.Token) && !isOperator(jToken.Token) {
+								break
+							}
+							equation = append(equation, jToken)
+						}
+						result = solveEquation(equation)
+						valueStr = strconv.Itoa(result)
+						pos += len(equation)
+						break
 					} else {
-						valueStr += iToken.Token
+						varInMemory := memory["var_"+iToken.Token]
+						if varInMemory != nil {
+							valueStr += varInMemory.(string)
+						} else {
+							valueStr += iToken.Token
+						}
 					}
 				}
 
@@ -128,62 +152,6 @@ func parser(tokens []Token) {
 			}
 			program = append(program, node)
 			pos += posUpdateVar
-			// case token.tokenType == "number":
-			// 	var equation = []Token{}
-			// 	var posUpdaterVar = 0
-			// 	for i := pos; i < len(tokens); i++ {
-			// 		var iToken Token = tokens[i]
-			// 		if isKeyword(iToken.Token) && !isOperator(iToken.Token) {
-			// 			break
-			// 		}
-			// 		equation = append(equation, iToken)
-			// 		posUpdaterVar++
-			// 	}
-
-			// 	// calculate the equation
-			// 	var result int = 0
-			// 	var onHold []int = []int{}
-			// 	for i := 0; i < len(equation); i++ {
-			// 		var iToken Token = equation[i]
-			// 		if !isOperator(iToken.Token) {
-			// 			continue
-			// 		}
-			// 		onHold = append(onHold, i)
-			// 	}
-
-			// 	sort.Slice(onHold, func(i, j int) bool {
-			// 		return i > j
-			// 	})
-
-			// 	fmt.Println("EQUATIONLIST: ", equation)
-			// 	for i := 0; i < len(onHold); i++ {
-			// 		var operatorIndex int = onHold[i]
-			// 		var operator Token = equation[operatorIndex]
-			// 		var leftVal Token = equation[operatorIndex-1]
-			// 		var rightVal Token = equation[operatorIndex+1]
-			// 		leftValInt, Lerr := strconv.Atoi(leftVal.Token)
-			// 		RightValInt, Rerr := strconv.Atoi(rightVal.Token)
-
-			// 		if Lerr != nil || Rerr != nil {
-			// 			fmt.Println("Syntax Error: Invalid number in equation")
-			// 			return
-			// 		}
-			// 		fmt.Println("CALCULOS")
-
-			// 		switch {
-			// 		case operator.Token == KW_MULT:
-			// 			result *= (leftValInt * RightValInt)
-			// 		case operator.Token == KW_DIV:
-			// 			result /= (leftValInt / RightValInt)
-			// 		case operator.Token == KW_PLUS:
-			// 			result += (leftValInt + RightValInt)
-			// 		case operator.Token == KW_MINUS:
-			// 			result -= (leftValInt - RightValInt)
-			// 		}
-			// 	}
-			// 	fmt.Println(result)
-
-			// 	pos += posUpdaterVar
 		}
 		pos++
 		runner(program)

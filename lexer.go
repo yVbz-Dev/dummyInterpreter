@@ -61,6 +61,12 @@ func tokenize(line string, lineNum int) []Token {
 			currTokenType = ""
 			currToken = ""
 			readingToken = false
+		case isOperator(string(char)) && readingToken && currTokenType == "command":
+			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+			tokens = append(tokens, Token{string(char), lineNum, i + 1, "operator"})
+			currTokenType = ""
+			currToken = ""
+			readingToken = false
 		case readingToken:
 			currToken += string(char)
 		default:
