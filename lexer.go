@@ -70,6 +70,10 @@ func tokenize(line string, lineNum int) []Token {
 		}
 
 		if i+1 >= len(line) {
+			if currToken == "" || currToken == " " {
+				continue
+			}
+
 			// append the fucking token
 			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
 			currTokenType = ""
@@ -80,4 +84,14 @@ func tokenize(line string, lineNum int) []Token {
 
 	// return tokens
 	return tokens
+}
+
+func hasToken(tokens []Token, token Token) bool {
+	var hasToken bool = false
+	for _, t := range tokens {
+		if t.Token == token.Token {
+			hasToken = true
+		}
+	}
+	return hasToken
 }
