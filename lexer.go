@@ -21,11 +21,18 @@ func tokenize(line string) []Token {
 
 		if char == '\n' {
 			lineNum++
-			continue
 		}
 
 		// cases
 		switch {
+		case char == '\n':
+			if readingToken {
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+				currTokenType = ""
+				currToken = ""
+				currTokenLine = lineNum
+				readingToken = false
+			}
 		case char == ' ':
 			if readingToken && currTokenType != "string" {
 				tokens = append(tokens, Token{currToken, lineNum, currTokenType})

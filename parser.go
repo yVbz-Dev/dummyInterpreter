@@ -40,7 +40,7 @@ func parser(tokens []Token) {
 					// check equation
 					VarInMemory := memory["var_"+iToken.Token]
 					var isVar bool = false
-					if VarInMemory != nil {
+					if VarInMemory != nil && iToken.tokenType == "number" {
 						_, err := strconv.Atoi(VarInMemory.(string))
 						if err != nil {
 							return
@@ -70,13 +70,14 @@ func parser(tokens []Token) {
 							}
 
 						}
+
 						result = solveEquation(equation)
 						printVal = strconv.Itoa(result)
 						pos += len(equation)
 						break
 					} else {
 						VarInMemory := memory["var_"+iToken.Token]
-						if VarInMemory != nil {
+						if VarInMemory != nil && iToken.tokenType == "number" {
 							printVal += VarInMemory.(string)
 						} else {
 							printVal += iToken.Token
@@ -115,7 +116,18 @@ func parser(tokens []Token) {
 						continue
 					}
 
-					if iToken.tokenType == "number" {
+					// check equation
+					VarInMemory := memory["var_"+iToken.Token]
+					var isVar bool = false
+					if VarInMemory != nil {
+						_, err := strconv.Atoi(VarInMemory.(string))
+						if err != nil {
+							return
+						}
+						isVar = true
+					}
+
+					if iToken.tokenType == "number" || isVar {
 						var equation []Token = []Token{}
 						var result int
 						for j := i; j < len(tokens); j++ {
