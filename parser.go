@@ -77,8 +77,12 @@ func parser(tokens []Token) {
 						break
 					} else {
 						VarInMemory := memory["var_"+iToken.Token]
-						if VarInMemory != nil && iToken.tokenType == "number" {
-							printVal += VarInMemory.(string)
+						if VarInMemory != nil {
+							if iToken.tokenType == "string" {
+								printVal += iToken.Token
+							} else {
+								printVal += VarInMemory.(string)
+							}
 						} else {
 							printVal += iToken.Token
 						}
