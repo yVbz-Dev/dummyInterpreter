@@ -1,2 +1,7 @@
-var conta = 5 + 5 * 5
-print conta + conta * conta
+var x = 100
+var y = 50
+var resultado = x + y + 25
+
+print x
+print y
+print resultado

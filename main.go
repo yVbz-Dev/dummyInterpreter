@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 )
@@ -9,7 +8,6 @@ import (
 type Token struct {
 	Token     string
 	Line      int
-	Column    int
 	tokenType string
 }
 
@@ -50,13 +48,10 @@ func main() {
 
 	// read file
 	filename := args[1]
-	conteudo, err := os.Open(filename)
+	input, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("Erro ao abrir o arquivo .e: ", err)
+		fmt.Println("Error reading file:", err)
+		return
 	}
-	defer conteudo.Close()
-
-	// bufio!
-	scanner := bufio.NewScanner(conteudo)
-	lexer(*scanner)
+	lexer(string(input))
 }

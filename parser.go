@@ -64,7 +64,7 @@ func parser(tokens []Token) {
 
 							VarInMemory := memory["var_"+jToken.Token]
 							if VarInMemory != nil {
-								equation = append(equation, Token{VarInMemory.(string), jToken.Line, jToken.Column, "number"})
+								equation = append(equation, Token{VarInMemory.(string), jToken.Line, "number"})
 							} else {
 								equation = append(equation, jToken)
 							}
@@ -123,8 +123,15 @@ func parser(tokens []Token) {
 							if isKeyword(jToken.Token) && !isOperator(jToken.Token) {
 								break
 							}
-							equation = append(equation, jToken)
+
+							VarInMemory := memory["var_"+jToken.Token]
+							if VarInMemory != nil {
+								equation = append(equation, Token{VarInMemory.(string), jToken.Line, "number"})
+							} else {
+								equation = append(equation, jToken)
+							}
 						}
+
 						result = solveEquation(equation)
 						valueStr = strconv.Itoa(result)
 						pos += len(equation)
@@ -146,15 +153,15 @@ func parser(tokens []Token) {
 
 			// check
 			if isKeyword(varName.Token) {
-				fmt.Println("Syntax error: variable name cannot be a keyword at line " + strconv.Itoa(varName.Line) + " column " + strconv.Itoa(varName.Column))
+				fmt.Println("Syntax error: variable name cannot be a keyword at line " + strconv.Itoa(varName.Line))
 				return
 			}
 			if equalSign.Token != "=" {
-				fmt.Println("Syntax error: expected '=' after variable name at line " + strconv.Itoa(equalSign.Line) + " column " + strconv.Itoa(equalSign.Column))
+				fmt.Println("Syntax error: expected '=' after variable name at line " + strconv.Itoa(equalSign.Line))
 				return
 			}
 			if value.Token == ("EOF") {
-				fmt.Println("Syntax error: expected a value after '=' at line " + strconv.Itoa(value.Line) + " column " + strconv.Itoa(value.Column))
+				fmt.Println("Syntax error: expected a value after '=' at line " + strconv.Itoa(value.Line))
 				return
 			}
 
@@ -178,7 +185,6 @@ func nextToken(tokens []Token, currToken int) Token {
 		return Token{
 			"EOF",
 			0,
-			0,
 			"EOF",
 		}
 	}
@@ -189,7 +195,6 @@ func prevToken(tokens []Token, currToken int) Token {
 	if currToken-1 < 0 {
 		return Token{
 			"EOF",
-			0,
 			0,
 			"EOF",
 		}
@@ -240,7 +245,7 @@ func solveEquation(equation []Token) int {
 		case operator.Token == KW_MINUS:
 			iResult = (leftValInt - RightValInt)
 		}
-		equation = slices.Replace(equation, operatorIndex-1, operatorIndex+2, Token{strconv.Itoa(iResult), leftVal.Line, leftVal.Column, "number"})
+		equation = slices.Replace(equation, operatorIndex-1, operatorIndex+2, Token{strconv.Itoa(iResult), leftVal.Line, "number"})
 	}
 	result, err := strconv.Atoi(equation[0].Token)
 	if err != nil {

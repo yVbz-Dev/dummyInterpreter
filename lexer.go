@@ -1,40 +1,37 @@
 package main
 
-import (
-	"bufio"
-)
-
-func lexer(sourceCode bufio.Scanner) {
-	var lineNum int = 0
-	for sourceCode.Scan() {
-		// get line
-		lineNum++
-		line := sourceCode.Text()
-
-		// tokenize!
-		var tokens []Token = tokenize(line, lineNum)
-		parser(tokens)
-	}
+func lexer(sourceCode string) {
+	// tokenize!
+	var tokens []Token = tokenize(sourceCode)
+	parser(tokens)
 }
 
-func tokenize(line string, lineNum int) []Token {
+func tokenize(line string) []Token {
 	// vars
 	var currToken string
+	var currTokenLine int
 	var currTokenType string
 	var readingToken bool = false
+	var lineNum int = 0
 	var tokens = []Token{}
 
 	// read trought the line!
 	for i := 0; i < len(line); i++ {
 		char := line[i]
 
+		if char == '\n' {
+			lineNum++
+			continue
+		}
+
 		// cases
 		switch {
 		case char == ' ':
 			if readingToken && currTokenType != "string" {
-				tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 				currTokenType = ""
 				currToken = ""
+				currTokenLine = lineNum
 				readingToken = false
 			} else if readingToken {
 				currToken += string(char)
@@ -42,34 +39,52 @@ func tokenize(line string, lineNum int) []Token {
 		case char == '"':
 			if readingToken {
 				readingToken = false
-				tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 				currToken = ""
 				currTokenType = ""
+				currTokenLine = lineNum
 			} else {
 				readingToken = true
 				currTokenType = "string"
+				currTokenLine = lineNum
 			}
 		case (char >= '0' && char <= '9') && currTokenType != "string":
 			readingToken = true
 			currTokenType = "number"
 			currToken += string(char)
+			currTokenLine = lineNum
 		case char == '/' && line[i+1] == '/' && !readingToken:
 			return tokens
 		case isKeyword(string(char)) && currTokenType == "number":
-			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
-			tokens = append(tokens, Token{string(char), lineNum, i + 1, "operator"})
+			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+			tokens = append(tokens, Token{string(char), lineNum, "operator"})
 			currTokenType = ""
 			currToken = ""
+			currTokenLine = lineNum
 			readingToken = false
 		case isOperator(string(char)) && readingToken && currTokenType == "command":
-			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
-			tokens = append(tokens, Token{string(char), lineNum, i + 1, "operator"})
+			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+			tokens = append(tokens, Token{string(char), lineNum, "operator"})
 			currTokenType = ""
 			currToken = ""
+			currTokenLine = lineNum
+			readingToken = false
+		case currTokenLine != lineNum:
+			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+			currTokenType = ""
+			currToken = ""
+			currTokenLine = lineNum
 			readingToken = false
 		case readingToken:
 			currToken += string(char)
 		default:
+			if i > 0 {
+				var oldChar string = string(line[i-1])
+				if oldChar != " " && oldChar != "\n" {
+					currToken += oldChar
+				}
+			}
+			currTokenLine = lineNum
 			readingToken = true
 			currTokenType = "command"
 			currToken += string(char)
@@ -81,7 +96,7 @@ func tokenize(line string, lineNum int) []Token {
 			}
 
 			// append the fucking token
-			tokens = append(tokens, Token{currToken, lineNum, i, currTokenType})
+			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 			currTokenType = ""
 			currToken = ""
 			readingToken = false
