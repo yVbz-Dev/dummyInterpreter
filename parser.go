@@ -181,19 +181,13 @@ func parser(tokens []Token) {
 				return
 			}
 
-			// create node
-			var node ASTNode
-			node.NodeAction = token.Token
-			node.NodeArgs = map[string]any{
-				"value":   valueStr,
-				"varName": varName.Token,
-			}
-			program = append(program, node)
 			pos += posUpdateVar
+			memory["var_"+varName.Token] = valueStr
 		}
 		pos++
-		runner(program)
 	}
+
+	runner(program)
 }
 
 func nextToken(tokens []Token, currToken int) Token {

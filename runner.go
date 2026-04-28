@@ -13,8 +13,6 @@ func runner(nodes []ASTNode) {
 			} else {
 				fmt.Println(node.NodeArgs["value"])
 			}
-		case node.NodeAction == KW_VAR:
-			memory["var_"+node.NodeArgs["varName"].(string)] = node.NodeArgs["value"]
 		}
 	}
 }
