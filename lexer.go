@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func lexer(sourceCode string) {
 	// tokenize!
 	var tokens []Token = tokenize(sourceCode)
@@ -69,6 +71,12 @@ func tokenize(line string) []Token {
 			currToken = ""
 			currTokenLine = lineNum
 			readingToken = false
+		case char == '(' || char == ')':
+			tokens = append(tokens, Token{string(char), lineNum, "condition"})
+			currTokenType = ""
+			currToken = ""
+			currTokenLine = lineNum
+			readingToken = false
 		case isOperator(string(char)) && readingToken && currTokenType == "command":
 			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 			tokens = append(tokens, Token{string(char), lineNum, "operator"})
@@ -109,6 +117,7 @@ func tokenize(line string) []Token {
 			readingToken = false
 		}
 	}
+	fmt.Println(tokens)
 
 	// return tokens
 	return tokens
