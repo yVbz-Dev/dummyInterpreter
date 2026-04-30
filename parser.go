@@ -303,6 +303,7 @@ func solveEquation(equation []Token) int {
 		}
 		equation = slices.Replace(equation, operatorIndex-1, operatorIndex+2, Token{strconv.Itoa(iResult), leftVal.Line, "number"})
 	}
+
 	result, err := strconv.Atoi(equation[0].Token)
 	if err != nil {
 		fmt.Println("Error in parsing string to number!")
@@ -340,5 +341,50 @@ func calculateOnHold(equation []Token) []int {
 }
 
 func calculateExpression(expression []Token) bool {
-	return true
+	var equation []Token = []Token{}
+	var appendingStart int = 0
+	var sign string
+	var leftVal any
+	var rightVal any
+
+	// translate the shit
+	for i := 0; i < len(expression); i++ {
+		var iToken Token = expression[i]
+		if iToken.Token == KW_EQUAL_CONDITION {
+			if len(equation) > 2 {
+				var equationResult int = solveEquation(equation)
+				expression = slices.Replace(expression, appendingStart, i, Token{strconv.Itoa(equationResult), iToken.Line, "number"})
+				appendingStart = i
+				equation = []Token{}
+				continue
+			}
+		}
+		equation = append(equation, iToken)
+	}
+
+	if len(expression) > 3 {
+		fmt.Println("Syntax error: if statement can only have 3 values in line ", expression[0].Line)
+		return false
+	}
+
+	// make sign, left, right vars
+	for i := 0; i < len(expression); i++ {
+		var iToken Token = expression[i]
+
+		// bad code, I know!
+		if i == 0 {
+			leftVal = iToken.Token
+		} else if i == 1 {
+			sign = iToken.Token
+		} else if i == 2 {
+			rightVal = iToken.Token
+		}
+	}
+
+	// now check!
+	if sign == KW_EQUAL_CONDITION {
+		return leftVal == rightVal
+	}
+
+	return false
 }
