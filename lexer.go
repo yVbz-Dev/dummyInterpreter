@@ -1,11 +1,10 @@
 package main
 
-import "fmt"
-
 func lexer(sourceCode string) {
 	// tokenize!
 	var tokens []Token = tokenize(sourceCode)
-	parser(tokens)
+	var nodes []ASTNode = parser(tokens)
+	runner(nodes)
 }
 
 func tokenize(line string) []Token {
@@ -72,6 +71,9 @@ func tokenize(line string) []Token {
 			currTokenLine = lineNum
 			readingToken = false
 		case char == '(' || char == ')':
+			if readingToken {
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+			}
 			tokens = append(tokens, Token{string(char), lineNum, "condition"})
 			currTokenType = ""
 			currToken = ""
@@ -117,7 +119,6 @@ func tokenize(line string) []Token {
 			readingToken = false
 		}
 	}
-	fmt.Println(tokens)
 
 	// return tokens
 	return tokens

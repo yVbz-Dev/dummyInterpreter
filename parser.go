@@ -14,7 +14,7 @@ var equationForce map[string]int = map[string]int{
 	KW_DIV:   2,
 }
 
-func parser(tokens []Token) {
+func parser(tokens []Token) []ASTNode {
 	// var program []ASTNode
 	var pos int = 0
 	var program []ASTNode
@@ -43,7 +43,7 @@ func parser(tokens []Token) {
 					if VarInMemory != nil && iToken.tokenType == "number" {
 						_, err := strconv.Atoi(VarInMemory.(string))
 						if err != nil {
-							return
+							return []ASTNode{}
 						}
 						isVar = true
 					}
@@ -101,6 +101,7 @@ func parser(tokens []Token) {
 			pos += posUpdaterVar
 			program = append(program, node)
 		case token.Token == KW_VAR:
+
 			// vars
 			var varName Token = nextToken(tokens, pos)
 			var equalSign Token = nextToken(tokens, pos+1)
@@ -126,7 +127,7 @@ func parser(tokens []Token) {
 					if VarInMemory != nil {
 						_, err := strconv.Atoi(VarInMemory.(string))
 						if err != nil {
-							return
+							return []ASTNode{}
 						}
 						isVar = true
 					}
@@ -170,24 +171,69 @@ func parser(tokens []Token) {
 			// check
 			if isKeyword(varName.Token) {
 				fmt.Println("Syntax error: variable name cannot be a keyword at line " + strconv.Itoa(varName.Line))
-				return
+				return []ASTNode{}
 			}
 			if equalSign.Token != "=" {
 				fmt.Println("Syntax error: expected '=' after variable name at line " + strconv.Itoa(equalSign.Line))
-				return
+				return []ASTNode{}
 			}
 			if value.Token == ("EOF") {
 				fmt.Println("Syntax error: expected a value after '=' at line " + strconv.Itoa(value.Line))
-				return
+				return []ASTNode{}
 			}
 
 			pos += posUpdateVar
 			memory["var_"+varName.Token] = valueStr
+		case token.Token == KW_IF:
+			nextToken := nextToken(tokens, pos)
+			if nextToken.Token != "(" {
+				fmt.Println("Syntax error: forgot ( in line ", token.Line+1)
+				return []ASTNode{}
+			}
+
+			// get the statement
+			var logicalCondition []Token = []Token{}
+			var posSkipper int = 0
+			for i := pos + 2; i < len(tokens); i++ {
+				posSkipper++
+				var iToken Token = tokens[i]
+				if iToken.Token == ")" {
+					break
+				}
+				if iToken.Token == "(" {
+					continue
+				}
+				logicalCondition = append(logicalCondition, iToken)
+			}
+
+			// get the code inside the {}
+			var codeInside []Token = []Token{}
+			var posSkipper2 int = 0
+			for i := pos + (2 + posSkipper); i < len(tokens); i++ {
+				posSkipper2++
+				var iToken Token = tokens[i]
+				if iToken.Token == "}" {
+					break
+				}
+				if iToken.Token == "{" {
+					continue
+				}
+				codeInside = append(codeInside, iToken)
+			}
+
+			var isTrue bool = calculateExpression(logicalCondition)
+			if isTrue {
+				var nodes []ASTNode = parser(codeInside)
+				runner(nodes)
+			}
+
+			pos += (posSkipper + posSkipper2) - 1
 		}
+
 		pos++
 	}
 
-	runner(program)
+	return program
 }
 
 func nextToken(tokens []Token, currToken int) Token {
@@ -291,4 +337,8 @@ func calculateOnHold(equation []Token) []int {
 	})
 
 	return onHold
+}
+
+func calculateExpression(expression []Token) bool {
+	return true
 }
