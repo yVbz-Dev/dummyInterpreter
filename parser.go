@@ -210,7 +210,6 @@ func parser(tokens []Token) []ASTNode {
 					logicalCondition = append(logicalCondition, iToken)
 				}
 			}
-			fmt.Println(logicalCondition)
 
 			// vars
 			var isTrue bool = calculateExpression(logicalCondition)

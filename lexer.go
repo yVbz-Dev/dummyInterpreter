@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 func lexer(sourceCode string) {
 	// tokenize!
 	var tokens []Token = tokenize(sourceCode)
@@ -62,9 +58,7 @@ func tokenize(line string) []Token {
 			}
 			tokens = append(tokens, Token{string(char), lineNum, "command"})
 		case char == '(' || char == ')':
-			fmt.Println("achou parenteses! ", readingToken)
 			if readingToken {
-				fmt.Println("ADICIONOU ESSE TOKEN: ", currToken)
 				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 			}
 			tokens = append(tokens, Token{string(char), lineNum, "condition"})
