@@ -1,5 +1,5 @@
 var user = "Vbz"
-var status = "inactive"
+var status = "active"
 
 if ( status == "active" ) {
     print "Welcome to eLang, " + user
