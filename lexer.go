@@ -13,7 +13,7 @@ func tokenize(line string) []Token {
 	var currTokenLine int
 	var currTokenType string
 	var readingToken bool = false
-	var lineNum int = 0
+	var lineNum int = 1
 	var tokens = []Token{}
 
 	// read trought the line!
@@ -34,6 +34,15 @@ func tokenize(line string) []Token {
 				currTokenLine = lineNum
 				readingToken = false
 			}
+		case char == '}':
+			if readingToken {
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+				currTokenType = ""
+				currToken = ""
+				currTokenLine = lineNum
+				readingToken = false
+			}
+			tokens = append(tokens, Token{string(char), lineNum, "command"})
 		case char == ' ':
 			if readingToken && currTokenType != "string" {
 				if char == '}' {

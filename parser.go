@@ -206,8 +206,11 @@ func parser(tokens []Token) []ASTNode {
 				logicalCondition = append(logicalCondition, iToken)
 			}
 
+			// vars
 			var isTrue bool = calculateExpression(logicalCondition)
+			var bracketCount int = -1
 			var posSkipper2 int = 0
+			var posSkipper3 int = 4
 
 			// get the code inside the {}
 			var codeInside []Token = []Token{}
@@ -215,24 +218,55 @@ func parser(tokens []Token) []ASTNode {
 				posSkipper2++
 				var iToken Token = tokens[i]
 				if iToken.Token == "}" {
-					break
+					if bracketCount == 0 {
+						break
+					}
+					bracketCount -= 1
 				}
 				if iToken.Token == "{" {
+					bracketCount++
 					continue
 				}
 				codeInside = append(codeInside, iToken)
 			}
-			fmt.Println("CODE INSIDE THE IF: ", codeInside)
+
+			// check if its has else
+			var elseToken Token = tokens[pos+posSkipper+posSkipper2]
+			var codeInsideElse []Token = []Token{}
+			if elseToken.Token != "" {
+				// get the code inside the {}
+				bracketCount = -1
+				for i := pos + (4 + posSkipper + posSkipper2); i < len(tokens); i++ {
+					posSkipper3++
+					var iToken Token = tokens[i]
+					if iToken.Token == "}" {
+						if bracketCount == 0 {
+							break
+						}
+						bracketCount = -1
+					}
+					if iToken.Token == "{" {
+						bracketCount++
+						continue
+					}
+					codeInsideElse = append(codeInsideElse, iToken)
+				}
+			}
 
 			if isTrue {
 				var nodes []ASTNode = parser(codeInside)
-				fmt.Println(nodes)
+				for i := 0; i < len(nodes); i++ {
+					program = append(program, nodes[i])
+				}
+			} else {
+				// noding
+				var nodes []ASTNode = parser(codeInsideElse)
 				for i := 0; i < len(nodes); i++ {
 					program = append(program, nodes[i])
 				}
 			}
 
-			pos += (posSkipper + posSkipper2) - 1
+			pos += (posSkipper + posSkipper2 + posSkipper3)
 		}
 
 		pos++
@@ -367,7 +401,6 @@ func calculateExpression(expression []Token) bool {
 		equation = append(equation, iToken)
 	}
 
-	fmt.Println(expression)
 	if len(expression) > 3 {
 		fmt.Println("Syntax error: if statement can only have 3 values in line", expression[0].Line)
 		return false
