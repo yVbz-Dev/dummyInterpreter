@@ -29,6 +29,8 @@ const (
 	KW_EQUAL_CONDITION     = "=="
 	KW_NOT_EQUAL_CONDITION = "!="
 	KW_IF                  = "if"
+	KW_LEFT_PARENTHESIS    = "("
+	KW_RIGHT_PARENTHESIS   = ")"
 )
 
 var keywords = map[string]bool{
@@ -42,6 +44,8 @@ var keywords = map[string]bool{
 	KW_EQUAL_CONDITION:     true,
 	KW_IF:                  true,
 	KW_NOT_EQUAL_CONDITION: true,
+	KW_LEFT_PARENTHESIS:    true,
+	KW_RIGHT_PARENTHESIS:   true,
 }
 
 func main() {

@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func lexer(sourceCode string) {
 	// tokenize!
 	var tokens []Token = tokenize(sourceCode)
@@ -34,6 +38,20 @@ func tokenize(line string) []Token {
 				currTokenLine = lineNum
 				readingToken = false
 			}
+		case isKeyword(string(char)):
+			if readingToken {
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+				currTokenType = ""
+				currToken = ""
+				currTokenLine = lineNum
+				readingToken = false
+			}
+			if isKeyword(string(char) + string(line[i+1])) {
+				tokens = append(tokens, Token{string(char) + string(line[i+1]), lineNum, "command"})
+				i++
+			} else {
+				tokens = append(tokens, Token{string(char), lineNum, "command"})
+			}
 		case char == '}':
 			if readingToken {
 				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
@@ -43,6 +61,17 @@ func tokenize(line string) []Token {
 				readingToken = false
 			}
 			tokens = append(tokens, Token{string(char), lineNum, "command"})
+		case char == '(' || char == ')':
+			fmt.Println("achou parenteses! ", readingToken)
+			if readingToken {
+				fmt.Println("ADICIONOU ESSE TOKEN: ", currToken)
+				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
+			}
+			tokens = append(tokens, Token{string(char), lineNum, "condition"})
+			currTokenType = ""
+			currToken = ""
+			currTokenLine = lineNum
+			readingToken = false
 		case char == ' ':
 			if readingToken && currTokenType != "string" {
 				if char == '}' {
@@ -78,15 +107,6 @@ func tokenize(line string) []Token {
 		case isKeyword(string(char)) && currTokenType == "number":
 			tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 			tokens = append(tokens, Token{string(char), lineNum, "operator"})
-			currTokenType = ""
-			currToken = ""
-			currTokenLine = lineNum
-			readingToken = false
-		case char == '(' || char == ')':
-			if readingToken {
-				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
-			}
-			tokens = append(tokens, Token{string(char), lineNum, "condition"})
 			currTokenType = ""
 			currToken = ""
 			currTokenLine = lineNum

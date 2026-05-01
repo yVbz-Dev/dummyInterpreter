@@ -1,5 +1,8 @@
-if (50 * 2 + 1 != 101) {
-    print "If esta funcionando!"
+var user = "Vbz"
+var status = "inactive"
+
+if ( status == "active" ) {
+    print "Welcome to eLang, " + user
 } else {
-    print "Else esta funcionando"
+    print "System offline"
 }

@@ -203,8 +203,14 @@ func parser(tokens []Token) []ASTNode {
 				if iToken.Token == "(" {
 					continue
 				}
-				logicalCondition = append(logicalCondition, iToken)
+				varInMemory := memory["var_"+iToken.Token]
+				if varInMemory != nil {
+					logicalCondition = append(logicalCondition, Token{varInMemory.(string), iToken.Line, iToken.tokenType})
+				} else {
+					logicalCondition = append(logicalCondition, iToken)
+				}
 			}
+			fmt.Println(logicalCondition)
 
 			// vars
 			var isTrue bool = calculateExpression(logicalCondition)
