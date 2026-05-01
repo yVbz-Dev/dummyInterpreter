@@ -208,22 +208,25 @@ func parser(tokens []Token) []ASTNode {
 
 			var isTrue bool = calculateExpression(logicalCondition)
 			var posSkipper2 int = 0
-			if isTrue {
-				// get the code inside the {}
-				var codeInside []Token = []Token{}
-				for i := pos + (2 + posSkipper); i < len(tokens); i++ {
-					posSkipper2++
-					var iToken Token = tokens[i]
-					if iToken.Token == "}" {
-						break
-					}
-					if iToken.Token == "{" {
-						continue
-					}
-					codeInside = append(codeInside, iToken)
-				}
 
+			// get the code inside the {}
+			var codeInside []Token = []Token{}
+			for i := pos + (2 + posSkipper); i < len(tokens); i++ {
+				posSkipper2++
+				var iToken Token = tokens[i]
+				if iToken.Token == "}" {
+					break
+				}
+				if iToken.Token == "{" {
+					continue
+				}
+				codeInside = append(codeInside, iToken)
+			}
+			fmt.Println("CODE INSIDE THE IF: ", codeInside)
+
+			if isTrue {
 				var nodes []ASTNode = parser(codeInside)
+				fmt.Println(nodes)
 				for i := 0; i < len(nodes); i++ {
 					program = append(program, nodes[i])
 				}

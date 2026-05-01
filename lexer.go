@@ -36,6 +36,9 @@ func tokenize(line string) []Token {
 			}
 		case char == ' ':
 			if readingToken && currTokenType != "string" {
+				if char == '}' {
+					currToken += string(char)
+				}
 				tokens = append(tokens, Token{currToken, lineNum, currTokenType})
 				currTokenType = ""
 				currToken = ""
