@@ -355,7 +355,7 @@ func calculateExpression(expression []Token) bool {
 	// translate the shit
 	for i := 0; i < len(expression); i++ {
 		var iToken Token = expression[i]
-		if iToken.Token == KW_EQUAL_CONDITION {
+		if iToken.Token == KW_EQUAL_CONDITION || iToken.Token == KW_NOT_EQUAL_CONDITION {
 			if len(equation) > 2 {
 				var equationResult int = solveEquation(equation)
 				expression = slices.Replace(expression, appendingStart, i, Token{strconv.Itoa(equationResult), iToken.Line, "number"})
@@ -367,8 +367,9 @@ func calculateExpression(expression []Token) bool {
 		equation = append(equation, iToken)
 	}
 
+	fmt.Println(expression)
 	if len(expression) > 3 {
-		fmt.Println("Syntax error: if statement can only have 3 values in line ", expression[0].Line)
+		fmt.Println("Syntax error: if statement can only have 3 values in line", expression[0].Line)
 		return false
 	}
 
@@ -389,6 +390,8 @@ func calculateExpression(expression []Token) bool {
 	// now check!
 	if sign == KW_EQUAL_CONDITION {
 		return leftVal == rightVal
+	} else if sign == KW_NOT_EQUAL_CONDITION {
+		return leftVal != rightVal
 	}
 
 	return false

@@ -19,27 +19,29 @@ type ASTNode struct {
 var memory = make(map[string]any)
 
 const (
-	KW_PRINT           = "print"
-	KW_VAR             = "var"
-	KW_PLUS            = "+"
-	KW_MINUS           = "-"
-	KW_MULT            = "*"
-	KW_DIV             = "/"
-	KW_EQUAL           = "="
-	KW_EQUAL_CONDITION = "=="
-	KW_IF              = "if"
+	KW_PRINT               = "print"
+	KW_VAR                 = "var"
+	KW_PLUS                = "+"
+	KW_MINUS               = "-"
+	KW_MULT                = "*"
+	KW_DIV                 = "/"
+	KW_EQUAL               = "="
+	KW_EQUAL_CONDITION     = "=="
+	KW_NOT_EQUAL_CONDITION = "!="
+	KW_IF                  = "if"
 )
 
 var keywords = map[string]bool{
-	KW_PRINT:           true,
-	KW_VAR:             true,
-	KW_PLUS:            true,
-	KW_MINUS:           true,
-	KW_MULT:            true,
-	KW_DIV:             true,
-	KW_EQUAL:           true,
-	KW_EQUAL_CONDITION: true,
-	KW_IF:              true,
+	KW_PRINT:               true,
+	KW_VAR:                 true,
+	KW_PLUS:                true,
+	KW_MINUS:               true,
+	KW_MULT:                true,
+	KW_DIV:                 true,
+	KW_EQUAL:               true,
+	KW_EQUAL_CONDITION:     true,
+	KW_IF:                  true,
+	KW_NOT_EQUAL_CONDITION: true,
 }
 
 func main() {
